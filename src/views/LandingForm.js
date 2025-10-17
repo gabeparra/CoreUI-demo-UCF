@@ -10,6 +10,10 @@ export default function LandingForm() {
     const [form, setForm] = useState({
         studentType: '',
         selections: [],
+        certificationChecked: false,
+        statusChangeMethod: '', // 'within-us' or 'depart-us'
+        programExtEndTerm: '',
+        programExtEndYear: '',
         // Form fields
         ucfId: '',
         givenName: '',
@@ -95,6 +99,26 @@ export default function LandingForm() {
             if (!form.usTelephone && !form.nonUsTelephone) {
                 e.usTelephone = 'At least one telephone number is required'
                 e.nonUsTelephone = 'At least one telephone number is required'
+            }
+
+            // Program Extension validation
+            if (form.selections.includes('Program Extension')) {
+                if (!form.programExtEndTerm) {
+                    e.programExtEndTerm = 'Please select your desired end term'
+                }
+                if (!form.programExtEndYear) {
+                    e.programExtEndYear = 'Please select your end year'
+                }
+            }
+
+            // Change of Non-Immigrant Status validation
+            if (form.selections.includes('Change of Non-Immigrant Status') && !form.statusChangeMethod) {
+                e.statusChangeMethod = 'Please select how you will change your non-immigrant status'
+            }
+
+            // Certification check
+            if (!form.certificationChecked) {
+                e.certificationChecked = 'You must certify that the information is correct'
             }
         }
 
@@ -503,11 +527,119 @@ export default function LandingForm() {
                                                     />
                                                 </CCol>
                                             </CRow>
+
+                                            {form.selections.includes('Program Extension') && (
+                                                <CRow className="mb-4">
+                                                    <CCol xs={12}>
+                                                        <h5>Program Extension</h5>
+                                                        <div className="alert alert-info">
+                                                            <p className="mb-0">
+                                                                To request a program extension, students must provide a letter from an academic advisor
+                                                                detailing the need for additional time to complete program requirements including an
+                                                                expected program end date. Students must also show proof of financial support for the
+                                                                extension. Program extensions are limited to one year in length from a student's
+                                                                current end date.
+                                                            </p>
+                                                        </div>
+                                                        <div className="mt-3">
+                                                            <CRow>
+                                                                <CCol md={6}>
+                                                                    <CFormSelect
+                                                                        label="Desired End Term"
+                                                                        name="programExtEndTerm"
+                                                                        value={form.programExtEndTerm}
+                                                                        onChange={update}
+                                                                        invalid={!!errors.programExtEndTerm}
+                                                                        feedbackInvalid={errors.programExtEndTerm}
+                                                                        options={[
+                                                                            { label: 'Choose...', value: '' },
+                                                                            { label: 'Spring', value: 'spring' },
+                                                                            { label: 'Summer A/C/D', value: 'summer-acd' },
+                                                                            { label: 'Summer B', value: 'summer-b' },
+                                                                            { label: 'Fall', value: 'fall' }
+                                                                        ]}
+                                                                    />
+                                                                </CCol>
+                                                                <CCol md={6}>
+                                                                    <CFormSelect
+                                                                        label="End Year"
+                                                                        name="programExtEndYear"
+                                                                        value={form.programExtEndYear}
+                                                                        onChange={update}
+                                                                        invalid={!!errors.programExtEndYear}
+                                                                        feedbackInvalid={errors.programExtEndYear}
+                                                                        options={[
+                                                                            { label: 'Choose...', value: '' },
+                                                                            { label: '2025', value: '2025' },
+                                                                            { label: '2026', value: '2026' },
+                                                                            { label: '2027', value: '2027' },
+                                                                            { label: '2028', value: '2028' },
+                                                                            { label: '2029', value: '2029' }
+                                                                        ]}
+                                                                    />
+                                                                </CCol>
+                                                            </CRow>
+                                                        </div>
+                                                    </CCol>
+                                                </CRow>
+                                            )}
+
+                                            {form.selections.includes('Change of Non-Immigrant Status') && (
+                                                <CRow className="mb-4">
+                                                    <CCol xs={12}>
+                                                        <h5>Change of Non-immigrant Status</h5>
+                                                        <div className="alert alert-warning">
+                                                            <p className="mb-0">
+                                                                UCF Global strongly recommends that students apply for an F-1 visa at a US Embassy or Consulate
+                                                                outside the United States due to the lengthy USCIS processing times and routine denials of
+                                                                Form I-539 "Change of Status" applications within the United States. Students who choose to
+                                                                apply for a change of status within the United States are urged to seek legal counsel from
+                                                                a qualified immigration attorney.
+                                                            </p>
+                                                        </div>
+                                                        <div className="mt-3">
+                                                            <CFormCheck
+                                                                name="statusChange"
+                                                                id="within-us"
+                                                                label="I will be changing my non-immigrant status from within the United States"
+                                                                checked={form.statusChangeMethod === 'within-us'}
+                                                                onChange={() => setForm(f => ({ ...f, statusChangeMethod: 'within-us' }))}
+                                                                invalid={!!errors.statusChangeMethod}
+                                                            />
+                                                            <CFormCheck
+                                                                name="statusChange"
+                                                                id="depart-us"
+                                                                className="mt-2"
+                                                                label="I will be departing the United States to obtain an F-1 visa and plan to re-enter the United States in F-1 status"
+                                                                checked={form.statusChangeMethod === 'depart-us'}
+                                                                onChange={() => setForm(f => ({ ...f, statusChangeMethod: 'depart-us' }))}
+                                                                invalid={!!errors.statusChangeMethod}
+                                                            />
+                                                            {errors.statusChangeMethod && (
+                                                                <div className="invalid-feedback d-block">{errors.statusChangeMethod}</div>
+                                                            )}
+                                                        </div>
+                                                    </CCol>
+                                                </CRow>
+                                            )}
+
+                                            <CRow className="mb-4">
+                                                <CCol xs={12}>
+                                                    <CFormCheck
+                                                        id="certification-check"
+                                                        label="I hereby certify that the above information is correct and up to date."
+                                                        checked={form.certificationChecked}
+                                                        onChange={(e) => setForm(f => ({ ...f, certificationChecked: e.target.checked }))}
+                                                        invalid={!!errors.certificationChecked}
+                                                        feedbackInvalid={errors.certificationChecked}
+                                                    />
+                                                </CCol>
+                                            </CRow>
                                         </>
                                     )}
 
                                     <div className="d-flex gap-2">
-                                        <CButton type="submit" disabled={submitting}>
+                                        <CButton type="submit" disabled={submitting || !form.certificationChecked}>
                                             {submitting ? <><CSpinner size="sm" />&nbsp;Sending…</> : 'Send'}
                                         </CButton>
                                         <CButton
@@ -528,6 +660,10 @@ export default function LandingForm() {
                                                     countryOfBirth: '',
                                                     countryOfCitizenship: '',
                                                     hasUsAddress: true,
+                                                    certificationChecked: false,
+                                                    statusChangeMethod: '',
+                                                    programExtEndTerm: '',
+                                                    programExtEndYear: '',
                                                     hasNonUsAddress: true,
                                                     usAddress: { street: '', city: '', state: '', postalCode: '' },
                                                     nonUsAddress: { street: '', city: '', state: '', postalCode: '', country: '' },
