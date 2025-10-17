@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import {
     CCard, CCardBody, CCardHeader,
     CRow, CCol, CForm, CFormInput, CFormSelect, CFormTextarea,
-    CButton, CAlert, CSpinner,
+    CButton, CAlert, CSpinner, CFormCheck,
 } from '@coreui/react'
 
 export default function LandingForm() {
@@ -103,11 +103,12 @@ export default function LandingForm() {
                                                     'Change of Non-Immigrant Status',
                                                     'Other'
                                                 ].map((option) => (
-                                                    <CButton
+                                                    <CFormCheck
                                                         key={option}
-                                                        color={form.selections.includes(option) ? 'primary' : 'light'}
-                                                        className="text-start"
-                                                        onClick={() => {
+                                                        id={`check-${option.toLowerCase().replace(/\s+/g, '-')}`}
+                                                        label={option}
+                                                        checked={form.selections.includes(option)}
+                                                        onChange={() => {
                                                             setForm(f => ({
                                                                 ...f,
                                                                 selections: f.selections.includes(option)
@@ -115,9 +116,7 @@ export default function LandingForm() {
                                                                     : [...f.selections, option]
                                                             }))
                                                         }}
-                                                    >
-                                                        {option}
-                                                    </CButton>
+                                                    />
                                                 ))}
                                             </div>
                                             {errors.selections && (
